@@ -1,77 +1,42 @@
-﻿# StyleForge AI | NeuralArt
+﻿# StyleForge AI
 
-An AI-powered Neural Style Transfer application using Adaptive
-Instance Normalization (AdaIN).
+A web app for **neural style transfer**. Upload a content photo and a style image, adjust the style strength, and get a newly stylized image.
 
-## Architecture
+## Tech stack
+- **Frontend:** HTML, CSS, vanilla JavaScript (hosted on Vercel)
+- **Backend:** FastAPI + PyTorch (hosted on Hugging Face Spaces, Docker)
+- **Model:** AdaIN (Adaptive Instance Normalization) with a VGG-19 encoder and a trained decoder
 
-- Frontend: HTML, CSS, Vanilla JavaScript
-- Backend: FastAPI
-- Deep Learning: PyTorch
-- Encoder: VGG-19
-- Style transfer: AdaIN
-- Decoder: Convolutional neural network
-- Backend deployment: Hugging Face Docker Spaces
-- Frontend deployment: Vercel
-
-## Project structure
-
-```text
-StyleForgeAI/
-├── backend/
-│   ├── app/
-│   │   ├── __init__.py
-│   │   ├── net.py
-│   │   └── main.py
-│   ├── models/
-│   ├── requirements.txt
-│   ├── Dockerfile
-│   ├── README.md
-│   └── download_models.ps1
-├── frontend/
-│   ├── index.html
-│   ├── style.css
-│   ├── script.js
-│   ├── vercel.json
-│   └── README.md
-├── docs/
-├── .gitignore
-└── README.md
-```
-
-## Algorithm
-
-AdaIN aligns the channel-wise mean and standard deviation of content
-features with those of style features.
-
-The transformed feature representation is interpolated with the
-original content features using alpha, then reconstructed by a decoder.
+## How it works
+AdaIN matches the channel-wise mean and standard deviation of the content features to those of the style features, then a decoder turns the result back into an image. The **style strength** slider is the AdaIN alpha value, which blends the original and stylized features.
 
 ## Run locally
+Backend:
+```powershell
+cd backend
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install --index-url https://download.pytorch.org/whl/cpu torch==2.7.0+cpu torchvision==0.22.0+cpu
+pip install -r requirements.txt
+.\download_models.ps1
+python -m uvicorn app.main:app --port 8000
+```
 
-1. Run 01_setup_structure.ps1.
-2. Run 02_create_backend.ps1.
-3. Run 03_create_frontend.ps1.
-4. Run 04_test_local.ps1.
+Frontend (in a second terminal):
+```powershell
+cd frontend
+python -m http.server 5500
+```
+Open http://localhost:5500
 
-## Deployment
-
-Run 05_deploy_all.ps1 after authenticating GitHub, Vercel and Hugging Face.
-
-## Research reference
-
-Huang and Belongie (2017).
-
-Arbitrary Style Transfer in Real-Time with Adaptive Instance Normalization.
-
-https://arxiv.org/abs/1703.06868
-
-Original implementation:
-https://github.com/naoto0804/pytorch-AdaIN
+## API
+- `GET /` health check
+- `POST /stylize` multipart form with `content`, `style` and `strength` (0.0 to 1.0); returns a PNG
 
 ## Limitations
+- Runs on CPU, so large images are resized to 512 px on the longest side
+- Sign In is a client-side demo (accounts are stored in the browser)
 
-- CPU inference can be relatively slow.
-- Output quality depends on the pretrained encoder and decoder.
-- Large photographs are resized to a maximum dimension of 512 pixels.
-- The application is designed for image style transfer, not identity replacement.
+## Credits
+- Huang and Belongie (2017), *Arbitrary Style Transfer in Real-Time with Adaptive Instance Normalization*: https://arxiv.org/abs/1703.06868
+- Pretrained weights and reference implementation: https://github.com/naoto0804/pytorch-AdaIN (MIT license)
