@@ -1,4 +1,5 @@
-﻿import io
+import io
+import os
 import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -20,7 +21,7 @@ MODEL_DIR = BASE_DIR / "models"
 
 ALLOWED_FORMATS = {"JPEG", "PNG", "WEBP"}
 MAX_FILE_SIZE = 8 * 1024 * 1024
-MAX_DIMENSION = 512
+MAX_DIMENSION = int(os.environ.get("MAX_DIMENSION", "512"))
 DEVICE = torch.device("cpu")
 
 model = None
